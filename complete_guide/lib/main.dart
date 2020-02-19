@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 
 import './question.dart';
 import './answer.dart';
+import './quiz.dart';
+import './result.dart';
+
 
 void main() => runApp(App());
 
@@ -13,41 +16,52 @@ class App extends StatefulWidget {
 }
 
 class _AppState extends State<App> {
-  final questions = const [
+  final _questions = const [
     {
       'questionText': 'Favorite colour?',
       'answers': [
-        'Black',
-        'Red',
-        'Green',
+        {'text': 'Black', 'score': 1},
+        {'text': 'White', 'score': 3},
+        {'text': 'Blue', 'score': 5},
       ],
     },
     {
       'questionText': 'Favorite team?',
       'answers': [
-        'Arsenal',
-        'Chelsea',
-        'Spurs',
+        {'text': 'Chelsea', 'score': 3},
+        {'text': 'Arsenal', 'score': 1},
+        {'text': 'Spurs', 'score': 5},
       ],
     },
     {
       'questionText': 'Favorite city?',
       'answers': [
-        'Praga',
-        'Milan',
-        'Liverpool',
+        {'text': 'Praga', 'score': 4},
+        {'text': 'Milan', 'score': 1},
+        {'text': 'Liverpool', 'score': 8},
       ],
     },
   ];
 
   var _questionIndex = 0;
 
-  void _answerQuestion() {
+  var _totalScore = 0;
+
+  void _answerQuestion(int score) {
+ 
+    _totalScore += score;
+
     setState(() {
       _questionIndex += 1;
     });
 
     print('Answered question! :o');
+    print('Current score: $_totalScore');
+  }
+
+  void resetQuiz() {
+    _totalScore = 0;
+    _questionIndex = 0;
   }
 
   @override
@@ -58,19 +72,13 @@ class _AppState extends State<App> {
         appBar: AppBar(
           title: Text('Page Title'),
         ),
-        body: _questionIndex < questions.length
-            ? Column(
-                children: <Widget>[
-                  Question(questions[_questionIndex]['questionText']),
-                  ...(questions[_questionIndex]['answers'] as List<String>)
-                      .map((answer) {
-                    return Answer(_answerQuestion, answer);
-                  }).toList()
-                ],
+        body: _questionIndex < _questions.length
+            ? Quiz(
+                answerQuestion: _answerQuestion,
+                questionIndex: _questionIndex,
+                questions: _questions,
               )
-            : Center(
-                child: Text('You finished'),
-              ),
+            : Result(_totalScore, resetQuiz),
       ),
     );
   }
